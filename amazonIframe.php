@@ -12,31 +12,6 @@
 		array_push($shopify_inventory, "098172111");
 	}
 
-	// if(isset($_GET['amazonResponse'])) {
-
-	// 	// step 1
-	// 	$cSession = curl_init();
-
-	// 	// step 2
-	// 	curl_setopt($cSession, CURLOPT_URL, $_GET['amazonResponse']);
-	// 	curl_setopt($cSession, CURLOPT_RETURNTRANSFER, true);
-	// 	curl_setopt($cSession, CURLOPT_HEADER, false);
-
-	// 	// step 3
-	// 	$result = curl_exec($cSession);
-
-	// 	// step 4
-	// 	curl_close($cSession);
-
-	// 	// step 5
-	// 	echo $result;
-
-
-	// 	//$results = file_get_contents($_GET['amazonResponse']);
-	// 	//echo $results;
-	// 	die(0);
-	// }
-
 	if(isset($_GET['itemId'])) {	 // AJAX call was made
 
 		$itemId = $_GET['itemId'];
@@ -135,16 +110,8 @@
 		// Generate the signature required by the Product Advertising API
 		$signature = base64_encode(hash_hmac("sha256", $string_to_sign, $secret_key, true));
 
-		
-
 		// Generate the signed URL
-		//$request_url = 'http://'.$endpoint.$uri.'?'.$canonical_query_string.'&Signature='.rawurlencode($signature);
-		//$response = file_get_contents($request_url);
-		//return $response;
 		return 'http://'.$endpoint.$uri.'?'.$canonical_query_string.'&Signature='.rawurlencode($signature);
-
-		//echo "\"".$request_url."\"";
-		//}
 	}
 ?>
 
@@ -234,9 +201,8 @@
 	var button  	     = document.getElementById("fetchASIN-button");
 
 	var url;
-	var xhr, amazonXHR;
-	var amazonURL, amazonResults;
-	var amazonAjaxURL;
+	var xhr;
+	var amazonURL;
 
 	function getAmazonASIN(){
 		// here we do our Ajax Call
@@ -252,28 +218,11 @@
 				amazonURL = xhr.responseText;
 				searchResultsDiv.innerHTML = amazonURL;
 
-				//searchResultsDiv.innerHTML += "<iframe src=\"" + amazonURL +  "\"></iframe>";
-
-				// amazonXHR = new XMLHttpRequest();
-				// amazonAjaxURL = "amazoniframe.php?amazonResponse=" + amazonURL;
-				// amazonXHR.open('GET', amazonAjaxURL, true);
-				// amazonXHR.onreadystatechange = function() {
-				// 	if(amazonXHR.readyState == 4 && amazonXHR.status == 200) {
-				// 		amazonResults = amazonXHR.responseText;
-				// 		searchResultsDiv.innerHTML += "<div>" + amazonXHR.responseText + "</div>";
-				// 	}
-				// }
-
-				// amazonXHR.send();
 				button.disabled = 'disabled';
 			}
 		}
 
-		xhr.send();	// gets the Amazon URL
-		
-
-
-		//searchResultsDiv.innerHTML += "<div>" + amazonXHR.responseText + "</div>";
+		xhr.send();	// gets the Amazon info
 
 		}
 
