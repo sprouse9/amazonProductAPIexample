@@ -6,10 +6,31 @@
 	// click to import the item into your inventory
 
 	if(!isset($shopify_inventory)) {
-		$shopify_inventory = array();
-		array_push($shopify_inventory, "098172723");
-		array_push($shopify_inventory, "098172724");
-		array_push($shopify_inventory, "098172111");
+		// $shopify_inventory = array();
+		// array_push($shopify_inventory, "098172723");
+		// array_push($shopify_inventory, "098172724");
+		// array_push($shopify_inventory, "098172111");
+
+		// attempt to fetch Shopify inventory and display it
+		// GET https://testsprouse9.myshopify.com/admin/products.json
+		// https://91e4cea4698f6b28550dfe85eb55fced:6bea82a24d8feda4a520701ecda77c8d@testsprouse9.myshopify.com/admin/products.json
+		// https://91e4cea4698f6b28550dfe85eb55fced:6bea82a24d8feda4a520701ecda77c8d@testsprouse9.myshopify.com/admin/orders.json
+
+		$shopfiy_GET = "https://91e4cea4698f6b28550dfe85eb55fced:6bea82a24d8feda4a520701ecda77c8d@testsprouse9.myshopify.com/admin/products.json";
+
+		$cSession = curl_init();
+
+		// step 2
+		curl_setopt($cSession, CURLOPT_URL, $shopfiy_GET);
+		curl_setopt($cSession, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($cSession, CURLOPT_HEADER, false);
+
+		// step 3
+		$temp = curl_exec($cSession);
+		$shopify_inventory = json_decode($temp);
+
+		// step 4
+		curl_close($cSession);
 	}
 
 	if(isset($_GET['itemId'])) {	 // AJAX call was made
@@ -49,15 +70,13 @@
 		echo "<tr>" . 
 				"<td>LowestUsedPrice: " . $OfferSummary->LowestUsedPrice->FormattedPrice . "</td>" .
 				"<td>Available: " . $OfferSummary->TotalUsed . "</td></tr>";
-
 		echo "<tr>" .
-				"<td><input type=\"button\" name=\"addToInventory\" value=\"Add to inventory\"</td>";
-
+				"<td><input type=\"button\" name=\"addToInventory\" value=\"Add to inventory\" id=\"addToInventory-button\" onclick=\"addAmazonItemToShopify()\"</td>";
 		echo "</table>";
 
-		echo "<div><pre>";
-		print_r($oXML);
-		echo "</pre></div>";
+		// echo "<div><pre>";
+		// print_r($oXML);
+		// echo "</pre></div>";
 
 		die(0);
 	}
@@ -128,28 +147,56 @@
 			border: 1px solid;
 			border-collapse: collapse;
 			border-width: 1px;
-			/*display: inline-block;
-			width: 40%; */
-			min-height: 300pt;
-
+			display: inline-block;
+			width: 100%;
+			min-height: 200pt;
+			vertical-align: top;
 		}
+
 
 		#fetchASIN-button {
 			background: lightblue;
 			height: 20px;
-
 		}
 
 
 		#fetchASIN-button:disabled {
 		    background: white;
 		    color: #555;
-
 		}
 
+		#shopfiyinventory {
+			border: 1px;
+		}
+
+
+#shopifytable {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14px;
+}
+
+#shopifytable td, #shopifytable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#shopifytable tr:nth-child(even){background-color: #f2f2f2;}
+
+#shopifytable tr:hover {background-color: #ddd;}
+
+#shopifytable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
+
+
+
 	</style>
-
-
 
 
 <body>
@@ -178,17 +225,65 @@
 	</form>
 
 
+	<p>
 
 <div id="amazonResultsDiv">
 	Amazon Result:
 
 </div>
 <div>Shopify Inventory:
+
+	<table id="shopifytable">
+		<tr>
+			<th>id</th><th>title</th>
+		</tr>
+
+		<?php
+
+			foreach ($shopify_inventory->products as $product) {
+				echo "<tr><td>" . $product->id . "</td><td>" . $product->title . "</td></tr>";
+				//echo "<tr><td>" . $product->id . "</td><td>" . $product->title . "</td><td>" . $product->price . "</td></tr>";
+			}
+
+
+
+
+
+		?>
+
+
+
+	</table>
+
 	<?php
 		// output all of the shopify inventory
-		foreach($shopify_inventory as $item) {
-			echo "<br>" . $item;
-		}
+		// foreach($shopify_inventory as $item) {
+		// 	echo "<br>" . $item;
+		//}
+
+		//echo "<p>" . $shopify_inventory->products[0]->title;
+
+
+		// echo "<table>";
+		// echo "<tr>" . 
+		// 		"<td>LowestNewPrice: " . $OfferSummary->LowestNewPrice->FormattedPrice . "</td>" .
+		// 		"<td>Available: " . $OfferSummary->TotalNew . "</td></tr>";
+		// echo "<tr>" . 
+		// 		"<td>LowestUsedPrice: " . $OfferSummary->LowestUsedPrice->FormattedPrice . "</td>" .
+		// 		"<td>Available: " . $OfferSummary->TotalUsed . "</td></tr>";
+
+		// echo "<tr>" .
+		// 		"<td><input type=\"button\" name=\"addToInventory\" value=\"Add to inventory\"</td>";
+
+		// echo "</table>";
+
+
+//		foreach($shopify_inventory->products)
+
+
+
+		//var_dump($shopify_inventory);
+
 	?>
 	
 </div>
@@ -225,6 +320,47 @@
 		xhr.send();	// gets the Amazon info
 
 		}
+
+	function addAmazonItemToShopify() {
+
+		// There should be an Amazon item already pulled up otherwise the button would not show
+		// The Amazon item info is in the PHP object $oXML
+
+
+		/*
+		$oXML->OperationRequest
+
+
+                            [2] => SimpleXMLElement Object
+                                (
+                                    [@attributes] => Array
+                                        (
+                                            [Name] => IdType
+                                            [Value] => ASIN
+                                        )
+
+                                )
+
+                            [3] => SimpleXMLElement Object
+                                (
+                                    [@attributes] => Array
+                                        (
+                                            [Name] => ItemId
+                                            [Value] => B000P297IO
+                                        )
+
+                                )
+
+*/
+
+		//rl = "amazoniframe.php?addItem=" + 
+
+
+
+
+	}
+
+
 
 </script>
 
