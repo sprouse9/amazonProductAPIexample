@@ -40,20 +40,24 @@
 		//echo "<div>" . $amazonURL . "</div>";
 
 		// step 1
-		$cSession = curl_init();
+		//$cSession = curl_init();
 
 		// step 2
-		curl_setopt($cSession, CURLOPT_URL, $amazonURL);
-		curl_setopt($cSession, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($cSession, CURLOPT_HEADER, false);
+		// curl_setopt($cSession, CURLOPT_URL, $amazonURL);
+		// curl_setopt($cSession, CURLOPT_RETURNTRANSFER, true);
+		// curl_setopt($cSession, CURLOPT_HEADER, false);
 
 		// step 3
-		$result = curl_exec($cSession);
+		// $result = curl_exec($cSession);
 
 		// step 4
-		curl_close($cSession);
+		// curl_close($cSession);
 
 		//echo htmlentities($result);
+
+		// Let's try using file_get_contents instead of CURL:
+		$result = file_get_contents($amazonURL);
+
 
 		$oXML = new SimpleXMLElement($result);
 
